@@ -1,0 +1,15 @@
+
+<div class="row">
+    <div class="col-3 mx-auto">
+        <span class="p-float-label">
+            <input id="float-input-invalid" type="text" pInputText [(ngModel)]="Login.username"
+                class="ng-invalid ng-dirty">
+            <label for="float-input-invalid">Username</label>
+        </span>
+        <p-password [(ngModel)]="Login.password" [toggleMask]="true"></p-password>
+    </div>
+</div>
+
+
+
+<button pButton type="button" label="Login" (click)="Submit()"></button>

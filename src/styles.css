@@ -1,0 +1,70 @@
+:root{
+    --primary: green;
+    --secondary: red;
+    --tertiary: rgb(255, 208, 0);
+
+    --primaryAlt: rgb(1, 88, 1);
+}
+
+.p-inputtext,
+.p-dropdown,
+.p-password{
+    width: 100%;
+}
+
+label {
+    font-weight: bold;
+    
+}
+
+h5 {
+    font-weight: bold;
+}
+
+.navbar {
+    background-color: var(--primary);
+}
+
+.navbar a {
+    color: white;
+}
+
+.navbar a:hover {
+    color: var(--tertiary);
+}
+
+.navbar a:focus {
+    color: var(--tertiary);
+}
+
+.p-dialog .p-dialog-header {
+    background: var(--primary);
+}
+
+/*---------------------------------------------------------------------------BUTTONS-----------------------------------------------------------------------------*/
+
+.p-button {
+    background-color: var(--primary);
+    border-color: var(--primary); 
+    color: white;
+}
+
+.p-button:enabled:hover {
+    background-color: var(--primaryAlt);
+    border-color: var(--primaryAlt);
+    color: white;
+}
+
+a.dropdown-item{
+    color: black;
+}
+
+a.dropdown-item{
+    color: black;
+}
+
+
+a.dropdown-item:hover{
+    color: var(--primary);
+}
+

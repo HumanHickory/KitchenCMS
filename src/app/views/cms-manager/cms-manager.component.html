@@ -1,0 +1,60 @@
+<div class="container row">
+    <div class="col-3">
+        <button pButton type="button" label="Create Organization" (click)="ShowOrganization = true"></button>
+    </div>
+
+    <div class="col-9 row" *ngIf="ShowOrganization">
+        <h5>Create Organization</h5>
+
+        <div class="col-12">
+            <span class="p-float-label mt-4">
+                <input id="float-input" type="text" pInputText [(ngModel)]="Organization.name">
+                <label for="float-input">Organization Name</label>
+            </span>
+        </div>
+
+        <div class="col-12 mt-4 mb-4"><b>Primary Contact Information</b></div>
+        <div class="col-4">
+            <span class="p-float-label">
+                <input id="float-input" type="text" pInputText [(ngModel)]="Organization.contact.firstName">
+                <label for="float-input">First Name</label>
+            </span>
+        </div>
+
+        <div class="col-4">
+            <span class="p-float-label">
+                <input id="float-input" type="text" pInputText [(ngModel)]="Organization.contact.lastName">
+                <label for="float-input">Last Name</label>
+            </span>
+        </div>
+
+        <div class="col-4">
+            <span class="p-float-label">
+                <input id="float-input" type="text" pInputText [(ngModel)]="Organization.contact.title">
+                <label for="float-input">Title (i.e. 'Owner', 'Manager')</label>
+            </span>
+        </div>
+
+        <div class="col-4 mt-4">
+            <span class="p-float-label">
+                <p-inputMask mask="(999) 999-9999" placeholder="(999) 999-9999" [(ngModel)]="Organization.contact.phone"></p-inputMask>
+                <label for="float-input">Phone</label>
+            </span>
+        </div>
+
+        <div class="col-8 mt-4">
+            <span class="p-float-label">
+                <input id="float-input" type="text" pInputText [(ngModel)]="Organization.contact.emailAddress">
+                <label for="float-input">Email Address</label>
+            </span>
+        </div>
+
+        <div class="col-2 mt-4">
+            <button pButton type="button" label="Create" (click)="CheckIfOrganizationExists()"></button>
+        </div>
+
+    </div>
+</div>
+
+<p-confirmDialog [style]="{width: '50vw'}" key="organizationDialog" [baseZIndex]="10000" rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>
+<p-confirmDialog [style]="{width: '50vw'}" key="contactDialog" [baseZIndex]="10000" rejectButtonStyleClass="p-button-outlined"></p-confirmDialog>
