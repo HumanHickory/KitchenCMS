@@ -20,7 +20,7 @@ export class RecipeService {
     }
     
     getIngredients(locationId: number){
-        return this.http.get<Array<Ingredient>>(environment.apiUrl() + "menu/GetIngredientByLocationId?locationId=" + locationId);       
+        return this.http.get<Ingredient[]>(environment.apiUrl() + "menu/GetIngredientByLocationId?locationId=" + locationId);       
     }
 
     listAllergens(){

@@ -12,6 +12,10 @@
     width: 100%;
 }
 
+.p-checkbox-box{
+    margin-right: 2px;
+}
+
 label {
     font-weight: bold;
     

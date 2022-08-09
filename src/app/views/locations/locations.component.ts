@@ -1,5 +1,4 @@
 import { Component, ViewChild } from '@angular/core';
-import { AgGridAngular } from 'ag-grid-angular';
 import { CellClickedEvent, ColDef, ColumnApi, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { Observable } from 'rxjs';
 import { Address } from 'src/app/models/address';
