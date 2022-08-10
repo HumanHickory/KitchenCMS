@@ -10,14 +10,14 @@ import { User } from "../models/user";
 export class LoginService {
     constructor(private http: HttpClient) {}
 
-    User: User = {id: 1, contactId: 1, isActive: true, dateAdded: null, contact: null, locations: null, organizationId: null};
-    LocationId: number = 0;
+    User: User = {id: 1, contactId: 1, isActive: true, dateAdded: null, contact: null, buisnesses: null, organizationId: null};
+    BusinessId: number = 0;
 
     Login(){
-        this.User = {id: 1, contactId: 1, isActive: true, dateAdded: null, contact: null, locations: null, organizationId: 1};
+        this.User = {id: 1, contactId: 1, isActive: true, dateAdded: null, contact: null, buisnesses: null, organizationId: 1};
     }
 
-    SetLocationId(id: number){
-        this.LocationId = id;
+    SetBusienssId(id: number){
+        this.BusinessId = id;
     }
 }

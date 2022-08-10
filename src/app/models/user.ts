@@ -1,4 +1,5 @@
 import { Contact } from "./contact";
+import { Business } from "./business";
 
 export interface User {
     id: number;
@@ -8,5 +9,5 @@ export interface User {
     organizationId: number;
     
     contact: Contact;
-    locations: Location[];
+    buisnesses: Business[];
 }

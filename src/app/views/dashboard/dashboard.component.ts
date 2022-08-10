@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
-import { Location } from 'src/app/models/location';
+import { Business } from 'src/app/models/business';
 import { Recipe } from 'src/app/models/recipe';
 import { LoginService } from 'src/app/services/loginService';
 import { OrganizationService } from 'src/app/services/organizationService';
@@ -16,8 +16,8 @@ import { RecipeService } from 'src/app/services/recipeService';
 })
 export class DashboardComponent implements OnInit {
 
-  locations: Location[];
-  selectedLocation: Location;
+  businesses: Business[];
+  selectedBusiness: Business;
   recipe: Recipe;
   recipes: Array<Recipe>;
   RecipeSelected: boolean = false;
@@ -37,19 +37,19 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit(): void {
     var userId = this.loginService.User.id;
-    this.peopleService.GetUserLocations(userId, false).subscribe(
-      locations => {
-        this.locations = locations;
-        this.selectedLocation = this.locations[0];
-        this.loginService.SetLocationId(this.locations[0].id);
+    this.peopleService.GetUserBusinesses(userId, false).subscribe(
+      business => {
+        this.businesses = business;
+        this.selectedBusiness= this.businesses[0];
+        this.loginService.SetBusienssId(this.businesses[0].id);
         
-        this.getRecipes(this.selectedLocation.id);          
+        this.getRecipes(this.selectedBusiness.id);          
             },
       error => { });
   }
 
-  getRecipes(locationId: number){
-    this.recipeService.getRecipes(locationId).subscribe(recipes =>{
+  getRecipes(businessId: number){
+    this.recipeService.getRecipes(businessId).subscribe(recipes =>{
       this.recipes = recipes;
     }, error =>{});
   }

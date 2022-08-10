@@ -29,8 +29,8 @@ import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { LoginComponent } from './views/login/login.component';
 import { CmsManagerComponent } from './views/cms-manager/cms-manager.component';
 import { UsersComponent } from './views/users/users.component';
-import { LocationsComponent } from './views/locations/locations.component';
-
+import { BusinessComponent } from './views/business/business.component';
+import { ButtonRendererComponent } from './views/button-renderer/button-renderer.component';
 
 
 
@@ -42,14 +42,14 @@ import { LocationsComponent } from './views/locations/locations.component';
     LoginComponent,
     CmsManagerComponent,
     UsersComponent,
-    LocationsComponent
+    BusinessComponent,
+    ButtonRendererComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
     BrowserAnimationsModule,
-    AgGridModule,
     FormsModule,
     TableModule,
     ButtonModule,
@@ -63,7 +63,10 @@ import { LocationsComponent } from './views/locations/locations.component';
     CheckboxModule,
     InputNumberModule,
     InputTextareaModule,
-    PasswordModule
+    PasswordModule,
+    AgGridModule
+
+    
   ],
   providers: [ConfirmationService, MessageService],
   bootstrap: [AppComponent]

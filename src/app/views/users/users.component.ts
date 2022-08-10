@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { CellClickedEvent, ColDef, ColumnApi, GridApi, GridReadyEvent } from 'ag-grid-community';
 import { MessageService } from 'primeng/api';
 import { AppComponent } from 'src/app/app.component';
-import { Location } from 'src/app/models/location';
+import { Business } from 'src/app/models/business';
 import { Contact } from 'src/app/models/contact';
 import { PeopleService } from 'src/app/services/peopleService';
 import { RecipeService } from 'src/app/services/recipeService';
@@ -20,8 +20,8 @@ import {InputMaskModule} from 'primeng/inputmask';
 
 })
 export class UsersComponent implements OnInit {
-  locations: Location[];
-  selectedLocation: Location;
+  businesses: Business[];
+  selectedBusiness: Business;
   userDialog: boolean = false;
   dialogContact: Contact = {id:0, firstName:"", lastName:"",emailAddress:"",phone:"",title:""};
   users!: Observable<User[]>;
@@ -36,7 +36,7 @@ export class UsersComponent implements OnInit {
 
   ngOnInit(): void {
     var userId = this.loginService.User.id;
-    this.peopleService.GetUserLocations(userId, false).subscribe(result =>{this.locations = result});
+    this.peopleService.GetUserBusinesses(userId, false).subscribe(result =>{this.businesses = result});
     }
   
   ShowUserDialog(){
@@ -64,7 +64,7 @@ export class UsersComponent implements OnInit {
   onGridReady(params: GridReadyEvent) {
     this.gridApi = params.api;
     this.gridColumnApi = params.columnApi;
-    this.users = this.peopleService.GetUsersByLocation(1);
+    this.users = this.peopleService.GetUsersByBusiness(1);
     this.gridApi.sizeColumnsToFit();
   }
   

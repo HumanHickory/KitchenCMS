@@ -1,0 +1,179 @@
+<div class="container">
+    <div class="row">
+        <h1>Business Manager</h1>
+        <div class="col-3 my-1">
+            <button pButton type="button" label="Add Business" (click)="ToggleBusinessDialog()"></button>
+        </div>
+        <div class="">
+
+
+            <ag-grid-angular style="width: 100%; height: 50vh;" class="ag-theme-alpine" [columnDefs]="columnDefs"
+                [defaultColDef]="defaultColDef" [rowData]="businesss | async" (gridReady)="onGridReady($event)"
+                (cellClicked)="onCellClicked($event)">
+            </ag-grid-angular>
+        </div>
+    </div>
+</div>
+
+
+
+<p-dialog header="{{DialogHeader}}" [(visible)]="ShowBusinessDialog" [style]="{width: '50vw'}" [modal]="true">
+    <div class="row">
+
+        <h5 class="col-12 my-1">Business Information</h5>
+        <div class="col-md-4 my-2">
+            <label>Name</label>
+            <input type="text" pInputText [(ngModel)]="dialogBusiness.name" *ngIf="Editing">
+            <div *ngIf="!Editing">{{dialogBusiness.name}}</div>
+        </div>
+        <div class="col-md-4 my-2">
+            <label>Store Number</label>
+            <input type="number" pInputText [(ngModel)]="dialogBusiness.storeNumber" *ngIf="Editing">
+            <div *ngIf="!Editing">{{dialogBusiness.storeNumber}}</div>
+        </div>
+    </div>
+
+
+    <div class="row" *ngIf="Editing">
+        <h5 class="col-12 mt-5">Primary Contact Information</h5>
+
+        <div class="row" *ngIf="UsingNewContact">
+            <div class="col-4 my-1">
+                <label>First Name</label>
+                <input type="text" pInputText [(ngModel)]="dialogBusiness.contact.firstName">
+
+            </div>
+
+            <div class="col-4 my-1">
+                <label>Last Name</label>
+                <input type="text" pInputText [(ngModel)]="dialogBusiness.contact.lastName">
+
+            </div>
+
+            <div class="col-4 my-1">
+                <label>Title (i.e. 'Owner', 'Manager')</label>
+                <input type="text" pInputText [(ngModel)]="dialogBusiness.contact.title">
+            </div>
+
+            <div class="col-4 my-1">
+                <label>Phone</label>
+                <p-inputMask mask="(999) 999-9999" placeholder="(999) 999-9999"
+                    [(ngModel)]="dialogBusiness.contact.phone">
+                </p-inputMask>
+            </div>
+
+            <div class="col-8 my-1">
+                <label>Email Address</label>
+                <input type="text" pInputText [(ngModel)]="dialogBusiness.contact.emailAddress">
+            </div>
+
+
+            <div class="col-12 text-center mt-3">
+                <h5>- OR -</h5>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <b>Link existing contact by phone number:</b>
+        </div>
+
+        <div class="col-4 my-1">
+            <p-inputMask mask="(999) 999-9999" placeholder="(999) 999-9999" [(ngModel)]="LookUpPhoneNumber">
+            </p-inputMask>
+        </div>
+
+        <div class="col-8 my-1">
+            <button type="button" class="btn btn-success" (click)="LookUpContact()">Search for Contact</button>
+        </div>
+
+        <div class="row mt-3" *ngIf="!UsingNewContact">
+            <div class="col-3">
+                <label>First Name:</label> {{ExistingContact.firstName}}
+            </div>
+            <div class="col-3">
+                <b>Last Name:</b> {{ExistingContact.lastName}}
+            </div>
+            <div class="col-3">
+                <b>Email:</b> {{ExistingContact.emailAddress}}
+            </div>
+            <div class="col-3">
+                <button type="button" class="btn btn-danger" (click)="RemoveExistingContact()">Remove Contact</button>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row" *ngIf="!Editing">
+        <h5 class="col-12 mt-3">Primary Contact Information</h5>
+        <div class="col-md-4 my-2">
+            <label>Name</label>
+            <div>{{dialogBusiness.contact.firstName}} {{dialogBusiness.contact.lastName}}</div>
+        </div>
+        <div class="col-md-4 my-2">
+            <label>Phone</label>
+            <div>{{dialogBusiness.contact.phone}}</div>
+        </div>
+        <div class="col-md-4 my-2">
+            <label>Email</label>
+            <div>{{dialogBusiness.contact.emailAddress}}</div>
+        </div>
+    </div>
+
+
+    <div class="row" *ngIf="Editing">
+        <h5 class="col-12 mt-5">Business Address</h5>
+
+        <div class="col-6 my-1">
+            <label>Address Line 1</label>
+            <input type="text" pInputText [(ngModel)]="dialogBusiness.address.addressLine1">
+            <input type="text" pInputText [(ngModel)]="dialogBusiness.address.addressLine1">
+        </div>
+
+        <div class="col-6 my-1">
+            <label>Address Line 2</label>
+            <input type="text" pInputText [(ngModel)]="dialogBusiness.address.addressLine2">
+        </div>
+
+        <div class="col-4 my-1">
+            <label>City</label>
+            <input type="text" pInputText [(ngModel)]="dialogBusiness.address.city">
+        </div>
+
+        <div class="col-4 my-1">
+            <label>State</label>
+            <input type="text" pInputText [(ngModel)]="dialogBusiness.address.state">
+        </div>
+
+        <div class="col-4 my-1">
+            <label>Zip</label>
+            <input type="number" pInputText [(ngModel)]="dialogBusiness.address.zip">
+        </div>
+
+
+        <div class="d-flex justify-content-end mt-3">
+            <p-button label="Submit" (onClick)="SaveBusiness()"></p-button>
+        </div>
+    </div>
+
+    <div class="row" *ngIf="!Editing">
+        <h5 class="col-12 mt-3">Business Address</h5>
+        <div class="col-12">{{dialogBusiness.address.addressLine1}}</div>
+        <div class="col-12">{{dialogBusiness.address.addressLine2}}</div>
+        <div class="col-12">{{dialogBusiness.address.city}}, {{dialogBusiness.address.state}} {{dialogBusiness.address.zip}}</div>
+    </div>    
+    
+    
+    <div class="row" *ngIf="!Editing">
+        <h5 class="col-12 mt-3">Users</h5>
+
+        <p-listbox [options]="OrganizationUsers" [(ngModel)]="SelectedUsers" [metaKeySelection]="false"
+        [checkbox]="true" [filter]="true" [multiple]="true" optionLabel="id">
+        <ng-template let-user pTemplate="item">
+            <div>
+                <div>{{user.contact.firstName}} {{user.contact.lastName}}</div>
+            </div>
+        </ng-template>
+    </p-listbox>
+    </div>
+
+</p-dialog>

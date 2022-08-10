@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { AppComponent } from 'src/app/app.component';
 import { Allergen } from 'src/app/models/allergen';
 import { Ingredient } from 'src/app/models/ingredient';
-import { Location } from 'src/app/models/location';
+import { Business } from 'src/app/models/business';
 import { Measurement } from 'src/app/models/measurement';
 import { Recipe } from 'src/app/models/recipe';
 import { RecipeIngredient } from 'src/app/models/recipeIngredient';
@@ -15,6 +15,7 @@ import { LoginService } from 'src/app/services/loginService';
 import { OrganizationService } from 'src/app/services/organizationService';
 import { PeopleService } from 'src/app/services/peopleService';
 import { RecipeService } from 'src/app/services/recipeService';
+import { ButtonRendererComponent } from '../button-renderer/button-renderer.component';
 
 @Injectable({
   providedIn: 'root',
@@ -27,24 +28,25 @@ import { RecipeService } from 'src/app/services/recipeService';
 
 })
 export class RecipesComponent implements OnInit {
-  locations: Location[];
+  businesses: Business[];
   allergens: Allergen[];
   selectedAllergens: Allergen[];
   measurements: Measurement[];
   recipeIngredients: RecipeIngredient[] = [];
   allIngredients: Ingredient[] = []; //used for add recipe dialog
 
-  recipe: Recipe;
-  selectedLocation: Location;
-  newIngredientDialog: boolean = false;
+  viewRecipe: Recipe;
+  selectedBusiness: Business;
+  ingredientDialog: boolean = false;
   recipeDialog: boolean = false;
   RecipeSelected: boolean = false;
 
-  newIngredient: Ingredient = { id: 0, name: "", locationId: 0, hasAllergens: false, allergens: [] };
-  dialogRecipe: Recipe = { id: 0, name: "", ingredients: [], steps: [], notes: [], minutes: 0, isPrepRecipe: false, locationId: 0 }
+  dialogIngredient: Ingredient = { id: 0, name: "", businessId: 0, hasAllergens: false, allergens: [] };
+  dialogRecipe: Recipe = { id: 0, name: "", ingredients: [], steps: [], notes: [], minutes: 0, isPrepRecipe: false, businessId: 0 }
   addOrUpdateText: string = "Add Recipe";
 
-
+  api: any;
+  frameworkComponents: any;
 
   public ingredients!: Observable<Ingredient[]>;
   private ingredientGridApi!: GridApi;
@@ -55,13 +57,49 @@ export class RecipesComponent implements OnInit {
   private recipeGridColumnApi!: ColumnApi;
 
   public ingredientColDef: ColDef[] = [
-    { field: 'id', headerName: 'Id' },
-    { field: 'name', headerName: 'Name' }
+    { field: 'name', headerName: 'Name' },
+    {
+      headerName: 'Edit',
+      cellRenderer: 'buttonRenderer',
+      cellRendererParams: {
+        onClick: this.EditIngredient.bind(this),
+        icon: '<i class="pi pi-pencil"></i>',
+        buttonColor: 'success'
+      }
+    },
+    {
+      headerName: 'Delete',
+      cellRenderer: 'buttonRenderer',
+      cellRendererParams: {
+        onClick: this.DeleteIngredient.bind(this),
+        icon: '<i class="pi pi-times"></i>',
+        buttonColor: 'danger'
+      }
+    },
   ];
 
+
+
   public recipeColDef: ColDef[] = [
-    { field: 'id', headerName: 'Id' },
-    { field: 'name', headerName: 'Name' }
+    { field: 'name', headerName: 'Name' },
+    {
+      headerName: 'Edit',
+      cellRenderer: 'buttonRenderer',
+      cellRendererParams: {
+        onClick: this.EditRecipe.bind(this),
+        icon: '<i class="pi pi-pencil"></i>',
+        buttonColor: 'success'
+      }
+    },
+    {
+      headerName: 'Delete',
+      cellRenderer: 'buttonRenderer',
+      cellRendererParams: {
+        onClick: this.DeleteRecipe.bind(this),
+        icon: '<i class="pi pi-times"></i>',
+        buttonColor: 'danger'
+      }
+    },
   ];
 
 
@@ -75,15 +113,20 @@ export class RecipesComponent implements OnInit {
     private peopleService: PeopleService,
     private recipeService: RecipeService,
     private messageService: MessageService,
-    private loginService: LoginService) { }
+    private loginService: LoginService) {
+
+    this.frameworkComponents = {
+      buttonRenderer: ButtonRendererComponent,
+    }
+  }
 
   ngOnInit(): void {
-    this.peopleService.GetUserLocations(this.loginService.User.id, true).subscribe(
-      locations => {
-        this.locations = locations;
-        this.selectedLocation = this.locations[0];
-        this.ingredients = this.recipeService.getIngredients(this.selectedLocation.id);
-        this.recipes = this.recipeService.getRecipes(this.selectedLocation.id);
+    this.peopleService.GetUserBusinesses(this.loginService.User.id, true).subscribe(
+      businesss => {
+        this.businesses = businesss;
+        this.selectedBusiness = this.businesses[0];
+        this.ingredients = this.recipeService.getIngredients(this.selectedBusiness.id);
+        this.recipes = this.recipeService.getRecipes(this.selectedBusiness.id);
       },
       error => { });
   }
@@ -102,19 +145,26 @@ export class RecipesComponent implements OnInit {
 
   OnIngredientCellClicked(e: CellClickedEvent): void {
     console.log('cellClicked', e);
-  }  
-  
+  }
+
   OnRecipeCellClicked(e: CellClickedEvent): void {
     this.ViewRecipe(e.data);
   }
 
   ShowIngredientDialog() {
     this.ListAllergens();
-    this.newIngredientDialog = true;
+    this.ingredientDialog = true;
+    this.addOrUpdateText = "Add Ingredient";
   }
 
-  ShowRecipeDialog() {
-    this.recipeDialog = true;
+  ShowRecipeDialog(recipeId: number) {
+    this.ListMeasurements();
+    this.recipeService.getIngredients(this.selectedBusiness.id).subscribe(ingredients => {
+      this.allIngredients = ingredients;
+    });
+    this.dialogRecipe.businessId = this.selectedBusiness.id;
+
+    if(recipeId == 0){
     this.dialogRecipe.ingredients = [];
     this.dialogRecipe.steps = [];
     this.dialogRecipe.notes = [];
@@ -122,19 +172,26 @@ export class RecipesComponent implements OnInit {
     this.dialogRecipe.minutes = 0;
     this.dialogRecipe.name = "";
     this.dialogRecipe.id = 0;
-    this.dialogRecipe.locationId = this.selectedLocation.id;
     this.addOrUpdateText = "Add Recipe";
-    this.recipeService.getIngredients(this.selectedLocation.id).subscribe(ingredients => {
-      this.allIngredients = ingredients;
-    });
 
-    this.ListMeasurements();
     var newIngredient: RecipeIngredient = { id: 0, recipeId: 0, ingredientId: 0, measurementId: 0, measurementAmount: 0, measurement: null, ingredient: null, recipe: null };
     var newStep: RecipeStep = { id: 0, recipeId: 0, description: "", stepOrder: 1 };
     this.dialogRecipe.ingredients.push(newIngredient);
     this.dialogRecipe.steps.push(newStep);
 
+  } else {
+    this.recipeService.getRecipe(recipeId).subscribe(recipe => {
+      this.dialogRecipe = recipe;     
+    }, error => {
+      this.messageService.add({ severity: 'error', summary: 'Fatal Error', detail: 'Could not load recipe: ' + error.error.message });
+    });
   }
+
+  this.recipeDialog = true;
+
+  }
+
+
 
   SaveRecipe(recipeId: number) {
     if (recipeId == 0)
@@ -142,15 +199,15 @@ export class RecipesComponent implements OnInit {
     else
       this.UpdateRecipe();
 
-    this.recipes = this.recipeService.getRecipes(this.selectedLocation.id);
+    this.recipes = this.recipeService.getRecipes(this.selectedBusiness.id);
   }
 
   CreateIngredient() {
-    this.newIngredient.allergens = this.selectedAllergens;
-    this.newIngredient.locationId = this.selectedLocation.id;
-    this.recipeService.createIngredient(this.newIngredient).subscribe(allergens => {
-      this.newIngredientDialog = false;
-      this.ingredients = this.recipeService.getIngredients(this.selectedLocation.id);
+    this.dialogIngredient.allergens = this.selectedAllergens;
+    this.dialogIngredient.businessId = this.selectedBusiness.id;
+    this.recipeService.createIngredient(this.dialogIngredient).subscribe(allergens => {
+      this.ingredientDialog = false;
+      this.ingredients = this.recipeService.getIngredients(this.selectedBusiness.id);
       this.messageService.add({ severity: 'success', summary: 'Added Ingredient', detail: 'New ingredient added successfully.' });
     }, error => {
       this.messageService.add({ severity: 'error', summary: 'Ingredient Not Added', detail: 'Failed to add new ingredient. Error: ' + error.error.message });
@@ -160,16 +217,16 @@ export class RecipesComponent implements OnInit {
   UpdateRecipe() {
     this.recipeService.updateRecipe(this.dialogRecipe).subscribe(data => {
       this.recipeDialog = false;
-      this.messageService.add({ severity: 'success', summary: 'Added Recipe', detail: 'New recipe added successfully.' });
+      this.messageService.add({ severity: 'success', summary: 'Updated Recipe', detail: 'Recipe Updated Successfully.' });
     }, error => {
-      this.messageService.add({ severity: 'error', summary: 'Recipe Not Added', detail: 'Failed to add new Recipe. Error: ' + error.error.message });
+      this.messageService.add({ severity: 'error', summary: 'Recipe Not Updated', detail: 'Failed to Update Recipe. Error: ' + error.error.message });
     });
   }
 
   CreateRecipe() {
     this.recipeService.createRecipe(this.dialogRecipe).subscribe(data => {
       this.recipeDialog = false;
-      this.dialogRecipe = { id: 0, name: "", ingredients: [], steps: [], notes: [], minutes: 0, isPrepRecipe: false, locationId: 0 };
+      this.dialogRecipe = { id: 0, name: "", ingredients: [], steps: [], notes: [], minutes: 0, isPrepRecipe: false, businessId: 0 };
       this.messageService.add({ severity: 'success', summary: 'Added Recipe', detail: 'New recipe added successfully.' });
     }, error => {
       this.messageService.add({ severity: 'error', summary: 'Recipe Not Added', detail: 'Failed to add new Recipe. Error: ' + error.error.message });
@@ -177,35 +234,44 @@ export class RecipesComponent implements OnInit {
 
   }
 
-  EditRecipe(recipe: Recipe){
+  EditRecipe(e: any) {
     this.addOrUpdateText = "Update Recipe";
-    this.recipeDialog = true;
-    this.recipeService.getIngredients(this.selectedLocation.id).subscribe(ingredients => {
-      this.allIngredients = ingredients;
-    });
-    this.ListMeasurements();
-
-    this.LoadRecipe(recipe.id);
+    this.ShowRecipeDialog(e.data.id);
   }
 
-  LoadRecipe(recipeId: number){
-    this.recipeService.getRecipe(recipeId).subscribe(recipe =>{
-      this.recipe = recipe;
-    }, error =>{
-      this.messageService.add({severity:'error', summary:'Fatal Error', detail:'Could not load recipe: ' + error.error.message});
-    });
+  EditIngredient(e: any) {
+    this.ShowIngredientDialog();
+    this.dialogIngredient = e.data;
+    this.selectedAllergens = this.dialogIngredient.allergens;
+    this.addOrUpdateText = "Update Ingredient";
 
   }
 
-  ViewRecipe(recipe: Recipe){
+  LoadRecipe(recipeId: number) {
+    this.recipeService.getRecipe(recipeId).subscribe(recipe => {
+      this.viewRecipe = recipe;     
+    }, error => {
+      this.messageService.add({ severity: 'error', summary: 'Fatal Error', detail: 'Could not load recipe: ' + error.error.message });
+    });
+  }
+
+  ViewRecipe(recipe: Recipe) {
     this.LoadRecipe(recipe.id);
     this.RecipeSelected = true;
 
   }
 
-  ChangeLocation() {
-    this.ingredients = this.recipeService.getIngredients(this.selectedLocation.id);
-    this.recipes = this.recipeService.getRecipes(this.selectedLocation.id);
+  DeleteIngredient(ingredientId: number){
+
+  }
+
+  DeleteRecipe(recipeId: number){
+
+  }
+
+  ChangeBusiness() {
+    this.ingredients = this.recipeService.getIngredients(this.selectedBusiness.id);
+    this.recipes = this.recipeService.getRecipes(this.selectedBusiness.id);
   }
 
   ListAllergens() {
@@ -247,7 +313,7 @@ export class RecipesComponent implements OnInit {
 
   RemoveNoteFromRecipe(note: any) {
     this.dialogRecipe.notes = this.dialogRecipe.notes.filter(x => x.description != note.description); // delete row
-        //TODO: Iterate through remaining steps to see if StepOrder is correct. For example, if we delete step 2, step 3 should become step 2
+    //TODO: Iterate through remaining steps to see if StepOrder is correct. For example, if we delete step 2, step 3 should become step 2
 
   }
 
