@@ -11,5 +11,5 @@ export interface Recipe {
         minutes: number;
         isPrepRecipe: boolean;
 
-        locationId: number;
+        businessId: number;
     }

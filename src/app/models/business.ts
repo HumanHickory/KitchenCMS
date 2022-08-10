@@ -1,7 +1,7 @@
 import { Address } from "./address";
 import { Contact } from "./contact";
 
-export interface Location {
+export interface Business {
     id: number;
     name: string;
     storeNumber: number;

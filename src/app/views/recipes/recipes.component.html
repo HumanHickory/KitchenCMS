@@ -6,7 +6,7 @@
         <div class="col-12 row">
             <div class="mb-5 col-4">
                 <h5>Select Location</h5>
-                <p-dropdown [options]="locations" [(ngModel)]="selectedLocation" optionLabel="name" (onChange)="ChangeLocation()"></p-dropdown>
+                <p-dropdown [options]="businesses" [(ngModel)]="selectedBusiness" optionLabel="name" (onChange)="ChangeBusiness()"></p-dropdown>
             </div>
         </div>
 
@@ -24,6 +24,7 @@
 
             <ag-grid-angular style="width: 100%; height: 50vh;" class="ag-theme-alpine" [columnDefs]="ingredientColDef"
                 [defaultColDef]="defaultColDef" [rowData]="ingredients | async"
+                [frameworkComponents]="frameworkComponents"
                 (gridReady)="onIngredientGridReady($event)" (cellClicked)="OnIngredientCellClicked($event)">
             </ag-grid-angular>
         </div>
@@ -35,13 +36,13 @@
                     <h5>Recipes</h5>
                 </div>
                 <div class="col-6 d-flex justify-content-end">
-                    <p-button styleClass="p-button-sm" label="Add Recipe" (click)="ShowRecipeDialog()">
+                    <p-button styleClass="p-button-sm" label="Add Recipe" (click)="ShowRecipeDialog(0)">
                     </p-button>
                 </div>
             </div>
 
             <ag-grid-angular style="width: 100%; height: 50vh;" class="ag-theme-alpine" [columnDefs]="recipeColDef"
-                [defaultColDef]="defaultColDef" [rowData]="recipes | async" (gridReady)="onRecipeGridReady($event)"
+                [defaultColDef]="defaultColDef" [rowData]="recipes | async" (gridReady)="onRecipeGridReady($event)" [frameworkComponents]="frameworkComponents"
                 (cellClicked)="OnRecipeCellClicked($event)">
             </ag-grid-angular>
         </div>
@@ -53,23 +54,23 @@
                 </div>
                 
             </div>
-            <h4>{{recipe.name}}</h4>
+            <h4>{{viewRecipe.name}}</h4>
 
-            <ul *ngFor="let ingredient of recipe.ingredients">
+            <ul *ngFor="let ingredient of viewRecipe.ingredients">
                 <li>{{ingredient.measurementAmount}} {{ingredient.measurement.name}} -
                     {{ingredient.ingredient.name}}</li>
             </ul>
 
             <b>Instructions</b>
             <ol>
-                <li *ngFor="let step of recipe.steps">{{step.description}}</li>
+                <li *ngFor="let step of viewRecipe.steps">{{step.description}}</li>
             </ol>
 
-            <b *ngIf="recipe.notes.length > 0">Notes</b>
+            <b *ngIf="viewRecipe.notes.length > 0">Notes</b>
 
-            <div *ngIf="recipe.notes.length > 0">
+            <div *ngIf="viewRecipe.notes.length > 0">
                 <ol>
-                    <li *ngFor="let note of recipe.notes">{{note.description}}</li>
+                    <li *ngFor="let note of viewRecipe.notes">{{note.description}}</li>
                 </ol>
             </div>
         </div>
@@ -78,11 +79,11 @@
 
 
 
-<p-dialog header="Add Ingredient" [(visible)]="newIngredientDialog">
+<p-dialog header="Add Ingredient" [(visible)]="ingredientDialog">
     <div class="row mt-3">
         <div class="col-5">
-            <b>Ingredient Name</b>
-            <input type="text" pInputText [(ngModel)]="newIngredient.name">
+            <b>Ingredient Manager</b>
+            <input type="text" pInputText [(ngModel)]="dialogIngredient.name">
         </div>
 
         <div class="col-7">
@@ -99,7 +100,7 @@
         </div>
 
         <div class="col-12">
-            <button pButton type="button" label="Add Ingredient" (click)="CreateIngredient()"></button>
+            <button pButton type="button" label="{{addOrUpdateText}}" (click)="CreateIngredient()"></button>
 
         </div>
     </div>
@@ -107,12 +108,10 @@
 
 
 
-
-
 <p-dialog header="Add Recipe" [(visible)]="recipeDialog" [style]="{width: '60vw', height: '90vh'}">
     <div class="row mt-3">
         <div class="col-4">
-            <b>Recipe Name</b>
+            <b>Recipe Manager</b>
             <input type="text" pInputText [(ngModel)]="dialogRecipe.name">
         </div>
 

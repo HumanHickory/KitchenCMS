@@ -8,7 +8,8 @@
 
 .p-inputtext,
 .p-dropdown,
-.p-password{
+.p-password, 
+.p-inputMask {
     width: 100%;
 }
 
@@ -59,6 +60,27 @@ h5 {
     color: white;
 }
 
+.btn-success {
+    background-color: var(--primary);
+}
+
+.btn-icon-success {
+    color: var(--primary);
+}
+
+.btn-icon-danger {
+    color: var(--secondary);
+}
+
+.btn-icon-warning {
+    color: var(--tertiary);
+}
+
+
+
+
+
+
 a.dropdown-item{
     color: black;
 }
@@ -72,3 +94,9 @@ a.dropdown-item:hover{
     color: var(--primary);
 }
 
+
+
+.ag-header {
+    background-color: var(--tertiary);
+    border-bottom: var(--ag-borders-critical) var(--ag-border-color);
+}
