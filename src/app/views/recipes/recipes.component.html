@@ -1,40 +1,58 @@
-<div class="col-md-8 ">
+<div class="container">
     <div class="row">
-        <div class="col-6 row">
-            <div class="col-6 mb-3">
-                <h4>Recipe</h4>
-            </div>
+        <h1>Recipes and Ingredients Manager</h1>
 
-            <div class="col-6 text-end mb-3">
-                <!-- <button pButton pRipple type="button" icon="pi pi-plus" class="p-button-rounded p-button-success"
-                    (click)="ShowRecipeDialog()"></button> -->
+        <!--LOCATIONS-->
+        <div class="col-12 row">
+            <div class="mb-5 col-4">
+                <h5>Select Location</h5>
+                <p-dropdown [options]="locations" [(ngModel)]="selectedLocation" optionLabel="name" (onChange)="ChangeLocation()"></p-dropdown>
             </div>
-            <p-table [value]="recipes" *ngIf="showRecipes">
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th *ngFor="let col of cols">
-                            {{col.header}}
-                        </th>
-                    </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-recipe>
-                    <tr>
-                        <td>{{recipe.name}}</td>
-                        <td>{{recipe.minutes}}</td>
-                        <td>{{recipe.isPrepRecipe}}</td>
-                        <td>
-                            <button pButton pRipple icon="pi pi-pencil"
-                                class="p-button-rounded p-button-success me-2"
-                                (click)="editRecipe(recipe)"></button>
-                            <button pButton pRipple icon="pi pi-book" class="p-button-rounded p-button-info"
-                                (click)="viewRecipe(recipe)"></button>
-                        </td>
-                    </tr>
-                </ng-template>
-            </p-table>
         </div>
 
-        <div class="col-6" *ngIf="RecipeSelected">
+        <!--INGREDIENTS-->
+        <div class="col-md-3">
+            <div class="row mb-2">
+                <div class="col-6">
+                    <h5>Ingredients</h5>
+                </div>
+                <div class="col-6 d-flex justify-content-end">
+                    <p-button styleClass="p-button-sm" label="Add Ingredient" (click)="ShowIngredientDialog()">
+                    </p-button>
+                </div>
+            </div>
+
+            <ag-grid-angular style="width: 100%; height: 50vh;" class="ag-theme-alpine" [columnDefs]="ingredientColDef"
+                [defaultColDef]="defaultColDef" [rowData]="ingredients | async"
+                (gridReady)="onIngredientGridReady($event)" (cellClicked)="OnIngredientCellClicked($event)">
+            </ag-grid-angular>
+        </div>
+
+        <!--RECIPES-->
+        <div class="col-5">
+            <div class="row mb-2">
+                <div class="col-6">
+                    <h5>Recipes</h5>
+                </div>
+                <div class="col-6 d-flex justify-content-end">
+                    <p-button styleClass="p-button-sm" label="Add Recipe" (click)="ShowRecipeDialog()">
+                    </p-button>
+                </div>
+            </div>
+
+            <ag-grid-angular style="width: 100%; height: 50vh;" class="ag-theme-alpine" [columnDefs]="recipeColDef"
+                [defaultColDef]="defaultColDef" [rowData]="recipes | async" (gridReady)="onRecipeGridReady($event)"
+                (cellClicked)="OnRecipeCellClicked($event)">
+            </ag-grid-angular>
+        </div>
+
+        <div class="col-4" *ngIf="RecipeSelected">
+            <div class="row mb-2">
+                <div class="col-12">
+                    <h5>Instructions</h5>
+                </div>
+                
+            </div>
             <h4>{{recipe.name}}</h4>
 
             <ul *ngFor="let ingredient of recipe.ingredients">
@@ -55,6 +73,148 @@
                 </ol>
             </div>
         </div>
-
     </div>
 </div>
+
+
+
+<p-dialog header="Add Ingredient" [(visible)]="newIngredientDialog">
+    <div class="row mt-3">
+        <div class="col-5">
+            <b>Ingredient Name</b>
+            <input type="text" pInputText [(ngModel)]="newIngredient.name">
+        </div>
+
+        <div class="col-7">
+            <b>Allergens</b>
+
+            <p-listbox [options]="allergens" [(ngModel)]="selectedAllergens" [metaKeySelection]="false"
+                [checkbox]="true" [filter]="true" [multiple]="true" optionLabel="name">
+                <ng-template let-allergen pTemplate="item">
+                    <div>
+                        <div>{{allergen.name}}</div>
+                    </div>
+                </ng-template>
+            </p-listbox>
+        </div>
+
+        <div class="col-12">
+            <button pButton type="button" label="Add Ingredient" (click)="CreateIngredient()"></button>
+
+        </div>
+    </div>
+</p-dialog>
+
+
+
+
+
+<p-dialog header="Add Recipe" [(visible)]="recipeDialog" [style]="{width: '60vw', height: '90vh'}">
+    <div class="row mt-3">
+        <div class="col-4">
+            <b>Recipe Name</b>
+            <input type="text" pInputText [(ngModel)]="dialogRecipe.name">
+        </div>
+
+        <div class="col-3">
+            <b>Average Time (min)</b>
+            <input type="number" pInputText [(ngModel)]="dialogRecipe.minutes">
+        </div>
+
+        
+        <div class="col-4 my-2">
+            <b>Prep Recipe or Menu Item Recipe</b>
+            <div class="field-checkbox">
+                <p-checkbox [(ngModel)]="dialogRecipe.isPrepRecipe" [binary]="true" inputId="binary"></p-checkbox>
+                <label for="binary"> Is this a prep recipe?</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+
+        <!--RECIPE INGREDIENTS-->
+        <div class="col-8 my-2 row">
+            <div class="col-6 mb-3">
+                <b>Ingredients</b>             
+            </div>
+            <div class="col-6 mb-3">
+                <div class="d-flex justify-content-end">
+                    <p-button styleClass="p-button-sm" label="Add Ingredient" (click)="AddNewRecipeIngredient()"></p-button>
+                </div>
+            </div>
+
+            <div *ngFor="let ing of dialogRecipe.ingredients; let i = index" class="my-1 row">
+                <div class="col-4">
+                    <p-dropdown [options]="allIngredients" optionLabel="name"
+                        [(ngModel)]="dialogRecipe.ingredients[i].ingredientId" optionValue="id"></p-dropdown>
+                </div>
+                <div class="col-3">
+                    <p-inputNumber [(ngModel)]="dialogRecipe.ingredients[i].measurementAmount"></p-inputNumber>
+                </div>
+                <div class="col-4">
+                    <p-dropdown [options]="measurements" optionLabel="name"
+                        [(ngModel)]="dialogRecipe.ingredients[i].measurementId" optionValue="id"></p-dropdown>
+                </div>
+                <div class="col-1">
+                    <button pButton pRipple type="button" icon="pi pi-times"
+                        class="p-button-rounded p-button-danger p-button-text"
+                        (click)="RemoveIngredientFromRecipe(ing)"></button>
+                </div>
+            </div>
+        </div>
+
+        <!--STEPS-->
+        <div class="col-8 mb-2 mt-4 row">
+
+            <div class="col-6 mb-3">
+                <b>Steps</b>             
+            </div>
+            <div class="col-6 mb-3">
+                <div class="d-flex justify-content-end">
+                    <p-button styleClass="p-button-sm" label="Add Step" (click)="AddNewRecipeStep()"></p-button>
+                </div>
+            </div>
+
+            <div *ngFor="let step of dialogRecipe.steps; let i = index" class="my-1 row">
+                <div class="col-11">
+                    <textarea pInputTextarea [rows]="1" [(ngModel)]="dialogRecipe.steps[i].description"></textarea>
+                </div>
+
+                <div class="col-1">
+                    <button pButton pRipple type="button" icon="pi pi-times"
+                        class="p-button-rounded p-button-danger p-button-text"
+                        (click)="RemoveStepFromRecipe(step)"></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-8 mb-2 mt-4 row">
+            <div class="col-6 mb-3">
+                <b>Notes</b>             
+            </div>
+            <div class="col-6 mb-3">
+                <div class="d-flex justify-content-end">
+                    <p-button styleClass="p-button-sm" label="Add Note" (click)="AddNewRecipeNotes()"></p-button>
+                </div>
+            </div>
+
+            <div *ngFor="let note of dialogRecipe.notes; let i = index" class="my-1 row">
+                <div class="col-11">
+                    <textarea pInputTextarea [rows]="1" [(ngModel)]="dialogRecipe.notes[i].description"></textarea>
+                </div>
+
+                <div class="col-1">
+                    <button pButton pRipple type="button" icon="pi pi-times"
+                        class="p-button-rounded p-button-danger p-button-text"
+                        (click)="RemoveNoteFromRecipe(note)"></button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="col-12 my-2">
+            <button pButton type="button" label="{{addOrUpdateText}}" (click)="SaveRecipe(dialogRecipe.id)"></button>
+        </div>
+    </div>
+</p-dialog>
