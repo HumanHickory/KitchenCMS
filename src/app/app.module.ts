@@ -25,12 +25,9 @@ import {PasswordModule} from 'primeng/password';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { RecipesComponent } from './views/recipes/recipes.component';
-import { RecipeComponent } from './views/recipe/recipe.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { LoginComponent } from './views/login/login.component';
-import { AdminComponent } from './views/admin/admin.component';
 import { CmsManagerComponent } from './views/cms-manager/cms-manager.component';
-import { IngredientsComponent } from './views/ingredients/ingredients.component';
 import { UsersComponent } from './views/users/users.component';
 import { LocationsComponent } from './views/locations/locations.component';
 
@@ -41,12 +38,9 @@ import { LocationsComponent } from './views/locations/locations.component';
   declarations: [
     AppComponent,
     RecipesComponent,
-    RecipeComponent,
     DashboardComponent,
     LoginComponent,
-    AdminComponent,
     CmsManagerComponent,
-    IngredientsComponent,
     UsersComponent,
     LocationsComponent
   ],
